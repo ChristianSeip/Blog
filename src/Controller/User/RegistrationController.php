@@ -4,12 +4,14 @@ namespace App\Controller\User;
 
 use App\Entity\User;
 use App\Form\RegistrationFormType;
+use App\Security\EmailVerifier;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -22,11 +24,13 @@ class RegistrationController extends AbstractController
 
     private VerifyEmailHelperInterface $verifyEmailHelper;
     private RequestStack $requestStack;
+    private EmailVerifier  $emailVerifier;
 
-    public function __construct(VerifyEmailHelperInterface $helper, RequestStack $requestStack)
+    public function __construct(VerifyEmailHelperInterface $helper, RequestStack $requestStack, EmailVerifier $emailVerifier)
     {
         $this->verifyEmailHelper = $helper;
         $this->requestStack = $requestStack;
+        $this->emailVerifier = $emailVerifier;
     }
 
     #[Route('/user/registration', name: 'app_user_registration')]
@@ -39,26 +43,24 @@ class RegistrationController extends AbstractController
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $user->setPassword($passwordHasher->hashPassword($user, $form->get('password')->getData()));
-            $user->setUsername($form->get('username')->getData());
-            $user->setLevel('User');
-            $user->setVerified(false);
-            $entityManager->persist($user);
-            $entityManager->flush();
-            $signatureComponents = $this->verifyEmailHelper->generateSignature('app_verify_email', $user->getId(), $user->getEmail(), ['id' => $user->getId()]);
-            $email = (new TemplatedEmail())
-                ->from(new Address('noreply@seip.io', 'NoReply'))
-                ->to($user->getEmail())
-                ->subject('Please Confirm your Email')
-                ->htmlTemplate('user/registration/confirmation_email.html.twig')
-                ->context([
-                    'signedUrl' => $signatureComponents->getSignedUrl(),
-                    'expiresAtMessageKey' => $signatureComponents->getExpirationMessageKey(),
-                    'expiresAtMessageData' => $signatureComponents->getExpirationMessageData(),
-                ]);
-            $mailer->send($email);
-            $this->addFlash('success', 'Your registration was successful. Please check your email to activate your account.');
-            return $this->redirectToRoute('app_register_success');
+            try {
+                $entityManager->getConnection()->beginTransaction();
+                $user->setPassword($passwordHasher->hashPassword($user, $form->get('password')->getData()));
+                $user->setUsername($form->get('username')->getData());
+                $user->setLevel('User');
+                $user->setVerified(false);
+                $entityManager->persist($user);
+                $entityManager->flush();
+                $this->emailVerifier->sendEmailConfirmation('app_verify_email', $user, (new TemplatedEmail())->htmlTemplate('user/registration/confirmation_email.html.twig'));
+                $entityManager->getConnection()->commit();
+                $this->addFlash('success', 'Your registration was successful. Please check your email to activate your account.');
+                return $this->redirectToRoute('app_register_success');
+            }
+            catch (\RuntimeException $e) {
+                $entityManager->getConnection()->rollBack();
+                $this->addFlash('error', $e->getMessage());
+                return $this->redirectToRoute('app_user_registration');
+            }
         }
         return $this->render('user/registration/register.html.twig', ['registrationForm' => $form->createView()]);
     }
@@ -68,11 +70,11 @@ class RegistrationController extends AbstractController
     {
         $id = $request->get('id');
         if (null === $id) {
-            return $this->redirectToRoute('app_register');
+            return $this->redirectToRoute('app_user_registration');
         }
         $user = $entityManager->getRepository(User::class)->find($id);
         if (null === $user) {
-            return $this->redirectToRoute('app_register');
+            return $this->redirectToRoute('app_user_registration');
         }
         try {
             $this->verifyEmailHelper->validateEmailConfirmation($request->getUri(), $user->getId(), $user->getEmail());
@@ -82,18 +84,18 @@ class RegistrationController extends AbstractController
         }
         catch (VerifyEmailExceptionInterface $e) {
             $this->addFlash('verify_email_error', $e->getReason());
-            return $this->redirectToRoute('app_register');
+            return $this->redirectToRoute('app_user_registration');
         }
         $this->addFlash('success', 'Your email address has been successfully verified. You can login now.');
         return $this->redirectToRoute('app_register_success');
     }
 
-    #[Route('/register/success', name: 'app_register_success')]
+    #[Route('/user/registration/success', name: 'app_register_success')]
     public function registerSuccess(Request $request): Response
     {
         $session = $this->requestStack->getSession();
         if (!$session->getFlashBag()->has('success')) {
-            return $this->redirectToRoute('app_register');
+            return $this->redirectToRoute('app_user_registration');
         }
         return $this->redirectToRoute('app_index');
     }
