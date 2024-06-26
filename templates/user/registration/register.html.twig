@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+        <header class="main-content-title">
+          <h2>Register</h2>
+        </header>
+        <div class="main-content-box">
+            {{ form_errors(registrationForm) }}
+
+            {{ form_start(registrationForm) }}
+                {{ form_row(registrationForm.email) }}
+                {{ form_row(registrationForm.username) }}
+                {{ form_row(registrationForm.password, {
+                    label: 'Password'
+                }) }}
+                <p>By submitting the form I agree to the <a href="https://www.seip.io/privacy">data protection conditions</a>.</p>
+                <button type="submit" class="btn">Register</button>
+            {{ form_end(registrationForm) }}
+        </div>
+{% endblock %}

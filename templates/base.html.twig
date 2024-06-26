@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>seip.io - {% block title %}Pblog{% endblock %}</title>
+    <link rel="stylesheet" href="https://fonts.seip.io/Lato/all.css">
+    <link rel="stylesheet" href="{{ asset('styles/main.css') }}">
+    {% block stylesheets %}{% endblock %}
+</head>
+
+<body>
+<div class="page-outer-container">
+  <header class="page-header">
+    <div>
+        <h1>
+            <a href="#">
+                <img class="logo" src="{{ asset('images/logo_small.png') }}" alt="Page Logo">
+            </a>
+        </h1>
+    </div>
+    <div class="search-container">
+      <form method="get" action="search">
+        <input type="text" name="q" placeholder="Search..." value="{{ app.request.query.get('q') }}">
+        <button type="submit" class="btn btn-primary">Search</button>
+      </form>
+    </div>
+    <div>
+      Menu
+    </div>
+  </header>
+  <div class="flash-messages">
+      {% for label, messages in app.flashes %}
+          {% for message in messages %}
+              <div class="flash-message alert {{ label }}">
+                  {{ message }}
+                  <button class="close" onclick="this.parentElement.style.display='none';">×</button>
+              </div>
+          {% endfor %}
+      {% endfor %}
+  </div>
+  <div class="content-boundary">
+    <div class="content-wrapper">
+      <main class="main-content-wrapper">
+        {% block body %}{% endblock %}
+      </main>
+      <div class="sidebar">
+        <div class="sidebar-box">
+          <header class="sidebar-box-title">Title</header>
+          <div>
+            Content
+          </div>
+        </div>
+        <div class="sidebar-box">
+          <header class="sidebar-box-title">Title</header>
+          <div>
+            Content
+          </div>
+        </div>
+        <div class="sidebar-box">
+          <header class="sidebar-box-title">Title</header>
+          <div>
+            Content
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="page-footer">
+    <div class="page-footer-wrapper">
+      <address class="copyright"><a href="https://www.seip.io">Copyrigh &copy; 2024 seip.io</a></address>
+      <nav class="footer-navigation">
+        <ul class="inline-list">
+          <li><a href="https://www.seip.io/legal-notice">Legal Notice</a></li>
+          <li><a href="https://www.seip.io/privacy">Privacy</a></li>
+        </ul>
+      </nav>
+    </div>
+  </footer>
+</div>
+</body>
+</html>
