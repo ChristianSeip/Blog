@@ -5,20 +5,22 @@ namespace App\Controller\User;
 use App\Entity\User;
 use App\Form\RegistrationFormType;
 use App\Security\EmailVerifier;
+use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Mime\Address;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 use SymfonyCasts\Bundle\VerifyEmail\VerifyEmailHelperInterface;
 
+/**
+ * Controller managing user registration and email verification.
+ */
 class RegistrationController extends AbstractController
 {
 
@@ -33,6 +35,16 @@ class RegistrationController extends AbstractController
         $this->emailVerifier = $emailVerifier;
     }
 
+    /**
+     * Registers a new user.
+     *
+     * @param Request $request
+     * @param UserPasswordHasherInterface $passwordHasher
+     * @param EntityManagerInterface $entityManager
+     * @param MailerInterface $mailer
+     * @return Response
+     * @throws Exception
+     */
     #[Route('/user/registration', name: 'app_user_registration')]
     public function register(Request $request, UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $entityManager, MailerInterface $mailer): Response
     {
@@ -65,6 +77,13 @@ class RegistrationController extends AbstractController
         return $this->render('user/registration/register.html.twig', ['registrationForm' => $form->createView()]);
     }
 
+    /**
+     * Handles the verification of user email address.
+     *
+     * @param Request $request
+     * @param EntityManagerInterface $entityManager
+     * @return Response
+     */
     #[Route('/user/verify/email', name: 'app_verify_email')]
     public function verifyUserEmail(Request $request, EntityManagerInterface $entityManager): Response
     {
@@ -90,6 +109,12 @@ class RegistrationController extends AbstractController
         return $this->redirectToRoute('app_register_success');
     }
 
+    /**
+     * Redirects to the index page after successful registration.
+     *
+     * @param Request $request
+     * @return Response
+     */
     #[Route('/user/registration/success', name: 'app_register_success')]
     public function registerSuccess(Request $request): Response
     {
