@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}User Control Panel{% endblock %}
+
+{% block body %}
+    <header class="main-content-title">
+        <h2>User Control Panel</h2>
+    </header>
+    <div class="main-content-box">
+        <ul class="button-list">
+            <li>
+                <a href="{{ path('app_user_change_profile') }}" class="button-list-item">
+                    <span class="button-list-icon">
+                        <i class="fas fa-user-edit"></i>
+                    </span>
+                    <span class="button-list-label">Edit Profile</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" class="button-list-item">
+                    <span class="button-list-icon">
+                        <i class="fas fa-key"></i>
+                    </span>
+                    <span class="button-list-label">Change Password</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" class="button-list-item">
+                    <span class="button-list-icon">
+                        <i class="fas fa-trash-alt"></i>
+                    </span>
+                    <span class="button-list-label">Delete Account</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+{% endblock %}

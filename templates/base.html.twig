@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>seip.io - {% block title %}Blog{% endblock %}</title>
     <link rel="stylesheet" href="https://fonts.seip.io/Lato/all.css">
+    <link rel="stylesheet" href="https://fonts.seip.io/Font-Awesome/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('styles/main.css') }}">
     {% block stylesheets %}{% endblock %}
 </head>
@@ -29,7 +30,7 @@
         <nav>
             <ul class="inline-list">
             {% if get_user() is not null %}
-                <li><a href="{{ path('app_index') }}">UCP</a></li>
+                <li><a href="{{ path('app_user_cp') }}">UCP</a></li>
                 <li><a href="{{ path('app_logout') }}">Logout</a></li>
             {% else %}
                 <li><a href="{{ path('app_user_registration') }}">Register</a></li>

@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Change Profile{% endblock %}
+
+{% block body %}
+    <header class="main-content-title">
+        <h2>Change Profile</h2>
+    </header>
+    <div class="main-content-box">
+        {{ form_errors(form) }}
+
+        {{ form_start(form) }}
+            {{ form_row(form.username, {
+                'disabled': not is_granted('ROLE_ADMIN')
+            }) }}
+            {{ form_row(form.email) }}
+            {{ form_row(form.name) }}
+            {{ form_row(form.location) }}
+
+            <button type="submit" class="btn">Save Changes</button>
+        {{ form_end(form) }}
+    </div>
+{% endblock %}
