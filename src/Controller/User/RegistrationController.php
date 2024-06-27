@@ -47,7 +47,7 @@ class RegistrationController extends AbstractController
                 $entityManager->getConnection()->beginTransaction();
                 $user->setPassword($passwordHasher->hashPassword($user, $form->get('password')->getData()));
                 $user->setUsername($form->get('username')->getData());
-                $user->setLevel('User');
+                $user->setRoles(['ROLE_USER']);
                 $user->setVerified(false);
                 $entityManager->persist($user);
                 $entityManager->flush();
