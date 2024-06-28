@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Post;
 use App\Form\CreatePostFormType;
+use App\Repository\PostRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -91,5 +92,25 @@ class PostController extends AbstractController
         $entityManager->flush();
         $this->addFlash('success', 'Post deleted successfully.');
         return $this->redirectToRoute('app_posts');
+    }
+
+    /**
+     * Searches for posts by title and content.
+     *
+     * @param PostRepository $blogPostRepository
+     * @param Request $request
+     * @return Response
+     */
+    #[Route('/posts/search', name: 'app_post_search', methods: ['GET'])]
+    public function searchBlogPost(PostRepository $blogPostRepository, Request $request): Response
+    {
+        $query = $request->query->get('keyword');
+        $blogPosts = [];
+        if ($query) {
+            $blogPosts = $blogPostRepository->searchByTitleAndContent($query);
+        }
+        return $this->render('post/index.html.twig', [
+            'posts' => $blogPosts,
+        ]);
     }
 }

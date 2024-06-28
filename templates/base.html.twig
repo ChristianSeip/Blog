@@ -21,8 +21,8 @@
         </h1>
     </div>
     <div class="search-container">
-      <form method="get" action="search">
-        <input type="text" name="q" placeholder="Search..." value="{{ app.request.query.get('q') }}">
+      <form method="get" action="/posts/search">
+        <input type="text" name="keyword" placeholder="Search..." value="{{ app.request.query.get('keyword') }}">
         <button type="submit" class="btn btn-primary">Search</button>
       </form>
     </div>
