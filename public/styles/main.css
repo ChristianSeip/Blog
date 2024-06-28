@@ -144,6 +144,13 @@ a {
     &:first-of-type {
         margin-top: 0;
     }
+    a {
+        text-decoration: none;
+        color: var(--accent-color);
+        &:hover {
+            color: var(--secondary-color);
+        }
+    }
 }
 
 .sidebar-box-title {

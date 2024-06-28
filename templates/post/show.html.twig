@@ -20,3 +20,26 @@
         </div>
     </div>
 {% endblock %}
+
+{% block sidebar %}
+    <div class="sidebar-box">
+        <header class="sidebar-box-title">Recommended</header>
+        <div>
+            <ul class="list-style-type-none">
+                {% for post in randomPosts %}
+                    <li><a href="{{ path('app_post_show', {'id': post.id}) }}">{{ post.title }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <div class="sidebar-box">
+        <header class="sidebar-box-title">Latest Posts</header>
+        <div>
+            <ul class="list-style-type-none">
+                {% for post in latestPosts %}
+                    <li><a href="{{ path('app_post_show', {'id': post.id}) }}">{{ post.title }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+{% endblock %}

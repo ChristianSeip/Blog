@@ -17,6 +17,9 @@ class PostRepository extends ServiceEntityRepository
     }
 
     /**
+     * Find posts with keyword in title and/or content
+     *
+     * @param string $query
      * @return Post[]
      */
     public function searchByTitleAndContent(string $query): array
@@ -28,6 +31,41 @@ class PostRepository extends ServiceEntityRepository
                 $qb->expr()->like('b.content', ':query')
             ))
             ->setParameter('query', '%' . $query . '%')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Find latest posts.
+     *
+     * @param int $limit
+     * @return array
+     */
+    public function findLatest(int $limit): array
+    {
+        return $this->createQueryBuilder('p')
+            ->orderBy('p.createdAt', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Find random posts.
+     *
+     * @param int $limit
+     * @return array
+     */
+    public function findRandom(int $limit): array
+    {
+        $qb = $this->createQueryBuilder('p');
+        $count = (int) $qb->select('COUNT(p.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+        $offset = max(0, rand(0, $count - $limit));
+        return $qb->select('p')
+            ->setMaxResults($limit)
+            ->setFirstResult($offset)
             ->getQuery()
             ->getResult();
     }

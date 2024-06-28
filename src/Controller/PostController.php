@@ -34,6 +34,8 @@ class PostController extends AbstractController
         }
         return $this->render('post/index.html.twig', [
             'posts' => $posts,
+            'latestPosts' => $entityManager->getRepository(Post::class)->findLatest(3),
+            'randomPosts' => $entityManager->getRepository(Post::class)->findRandom(3)
         ]);
     }
 
@@ -55,6 +57,8 @@ class PostController extends AbstractController
         $post->setContent($bbcodeParser->parse($post->getContent()));
         return $this->render('post/show.html.twig', [
             'post' => $post,
+            'latestPosts' => $entityManager->getRepository(Post::class)->findLatest(3),
+            'randomPosts' => $entityManager->getRepository(Post::class)->findRandom(3)
         ]);
     }
 
@@ -122,6 +126,8 @@ class PostController extends AbstractController
         }
         return $this->render('post/index.html.twig', [
             'posts' => $posts,
+            'latestPosts' => $postRepository->findLatest(3),
+            'randomPosts' => $postRepository->findRandom(3)
         ]);
     }
 }
