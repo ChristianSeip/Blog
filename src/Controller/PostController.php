@@ -2,7 +2,9 @@
 
 namespace App\Controller;
 
+use App\Entity\Comment;
 use App\Entity\Post;
+use App\Form\CommentFormType;
 use App\Form\CreatePostFormType;
 use App\Repository\PostRepository;
 use App\Service\BBCodeParser;
@@ -54,11 +56,17 @@ class PostController extends AbstractController
         if (!$post) {
             throw $this->createNotFoundException('Post not found');
         }
+        $comment = new Comment();
+        $commentForm = $this->createForm(CommentFormType::class, $comment);
         $post->setContent($bbcodeParser->parse($post->getContent()));
+        foreach ($post->getComments() as $c) {
+            $c->setContent($bbcodeParser->parse($c->getContent()));
+        }
         return $this->render('post/show.html.twig', [
             'post' => $post,
             'latestPosts' => $entityManager->getRepository(Post::class)->findLatest(3),
-            'randomPosts' => $entityManager->getRepository(Post::class)->findRandom(3)
+            'randomPosts' => $entityManager->getRepository(Post::class)->findRandom(3),
+            'commentForm' => $commentForm->createView(),
         ]);
     }
 
@@ -129,5 +137,55 @@ class PostController extends AbstractController
             'latestPosts' => $postRepository->findLatest(3),
             'randomPosts' => $postRepository->findRandom(3)
         ]);
+    }
+
+    /**
+     * Delete the given comment from post.
+     *
+     * @param Comment $comment
+     * @param EntityManagerInterface $entityManager
+     * @return Response
+     */
+    #[Route('/post/comment/delete/{id}', name: 'app_post_comment_delete')]
+    #[IsGranted('ROLE_USER')]
+    public function deleteComment(Comment $comment, EntityManagerInterface $entityManager): Response
+    {
+        if (!$this->isGranted('ROLE_ADMIN') && $comment->getAuthor()->getId() !== $this->getUser()->getId()) {
+            $this->addFlash('error', 'You are not allowed to delete this comment.');
+            return $this->redirectToRoute('app_post_show', ['id' => $comment->getPost()->getId()]);
+        }
+        $entityManager->remove($comment);
+        $entityManager->flush();
+        $this->addFlash('success', 'Post deleted successfully.');
+        return $this->redirectToRoute('app_post_show', ['id' => $comment->getPost()->getId()]);
+    }
+
+    /**
+     * Adds a comment to a specific post.
+     *
+     * @param string $id
+     * @param EntityManagerInterface $entityManager
+     * @param Request $request
+     * @return Response
+     */
+    #[Route('/post/{id}/comment', name: 'app_post_comment')]
+    #[IsGranted('ROLE_USER')]
+    public function addComment(string $id, EntityManagerInterface $entityManager, Request $request): Response
+    {
+        $post = $entityManager->getRepository(Post::class)->findOneBy(['id' => $id]);
+        if (!$post) {
+            throw $this->createNotFoundException('Post not found');
+        }
+        $comment = new Comment();
+        $commentForm = $this->createForm(CommentFormType::class, $comment);
+        $commentForm->handleRequest($request);
+        if ($commentForm->isSubmitted() && $commentForm->isValid()) {
+            $comment->setAuthor($this->getUser());
+            $comment->setPost($post);
+            $entityManager->persist($comment);
+            $entityManager->flush();
+            $this->addFlash('success', 'Comment created successfully.');
+        }
+        return $this->redirectToRoute('app_post_show', ['id' => $post->getId()]);
     }
 }
