@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Post{% endblock %}
+
+{% block body %}
+    <header class="main-content-title">
+        <h2>New Post</h2>
+    </header>
+    <div class="main-content-box">
+        {{ form_start(form) }}
+            <div class="form-group">
+                {{ form_label(form.title) }}
+                {{ form_widget(form.title) }}
+                {{ form_errors(form.title) }}
+            </div>
+            <div class="form-group">
+                {{ form_label(form.content) }}
+                {{ form_widget(form.content, {'attr': {'rows': 10}}) }}
+                {{ form_errors(form.content) }}
+            </div>
+            <button class="btn btn-primary">Create</button>
+        {{ form_end(form) }}
+    </div>
+{% endblock %}

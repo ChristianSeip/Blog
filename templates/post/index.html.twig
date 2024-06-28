@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Latest Posts{% endblock %}
+
+{% block body %}
+    {% if is_granted('ROLE_ADMIN') %}
+    <nav class="control-container">
+        <a href="{{ path('app_post_new') }}" class="btn btn-primary">New Post</a>
+    </nav>
+    {% endif %}
+    <header class="main-content-title">
+        <h2>Latest Posts</h2>
+    </header>
+    <div class="main-content-box">
+        <ul class="list-style-type-none post-list">
+            {% for post in posts %}
+                <li>
+                    <h3><a href="{{ path('app_post_show', {'id': post.id}) }}">{{ post.title }}</a></h3>
+                    <div class="teaser">
+                        {{ post.content[:250]|raw }}...
+                        <a href="{{ path('app_post_show', {'id': post.id}) }}">read more</a>
+                    </div>
+                    <footer class="meta">
+                        {{ post.author.name }} | {{ post.createdAt|date('d.m.Y H:i') }}
+                    </footer>
+                </li>
+            {% else %}
+                <li><p>There are no posts yet.</p></li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}
