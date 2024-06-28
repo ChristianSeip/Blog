@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Post;
 use App\Form\CreatePostFormType;
 use App\Repository\PostRepository;
+use App\Service\BBCodeParser;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,12 +22,16 @@ class PostController extends AbstractController
      * Lists all posts.
      *
      * @param EntityManagerInterface $entityManager
+     * @param BBCodeParser $bbcodeParser
      * @return Response
      */
     #[Route('/posts', name: 'app_posts')]
-    public function list(EntityManagerInterface $entityManager): Response
+    public function list(EntityManagerInterface $entityManager,BBCodeParser $bbcodeParser): Response
     {
         $posts = $entityManager->getRepository(Post::class)->findAll();
+        foreach ($posts as $post) {
+            $post->setContent($bbcodeParser->parse($post->getContent()));
+        }
         return $this->render('post/index.html.twig', [
             'posts' => $posts,
         ]);
@@ -37,15 +42,17 @@ class PostController extends AbstractController
      *
      * @param string $id
      * @param EntityManagerInterface $entityManager
+     * @param BBCodeParser $bbcodeParser
      * @return Response
      */
     #[Route('/post/show/{id}', name: 'app_post_show')]
-    public function show(string $id, EntityManagerInterface $entityManager): Response
+    public function show(string $id, EntityManagerInterface $entityManager, BBCodeParser $bbcodeParser): Response
     {
         $post = $entityManager->getRepository(Post::class)->findOneBy(['id' => $id]);
         if (!$post) {
             throw $this->createNotFoundException('Post not found');
         }
+        $post->setContent($bbcodeParser->parse($post->getContent()));
         return $this->render('post/show.html.twig', [
             'post' => $post,
         ]);
@@ -97,20 +104,24 @@ class PostController extends AbstractController
     /**
      * Searches for posts by title and content.
      *
-     * @param PostRepository $blogPostRepository
+     * @param PostRepository $postRepository
      * @param Request $request
+     * @param BBCodeParser $bbcodeParser
      * @return Response
      */
     #[Route('/posts/search', name: 'app_post_search', methods: ['GET'])]
-    public function searchBlogPost(PostRepository $blogPostRepository, Request $request): Response
+    public function searchBlogPost(PostRepository $postRepository, Request $request, BBCodeParser $bbcodeParser): Response
     {
         $query = $request->query->get('keyword');
-        $blogPosts = [];
+        $posts = [];
         if ($query) {
-            $blogPosts = $blogPostRepository->searchByTitleAndContent($query);
+            $posts = $postRepository->searchByTitleAndContent($query);
+            foreach ($posts as $post) {
+                $post->setContent($bbcodeParser->parse($post->getContent()));
+            }
         }
         return $this->render('post/index.html.twig', [
-            'posts' => $blogPosts,
+            'posts' => $posts,
         ]);
     }
 }
