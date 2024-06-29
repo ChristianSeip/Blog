@@ -167,6 +167,9 @@ a {
             color: var(--secondary-color);
         }
     }
+    li:not(:first-of-type) {
+        margin-top: 8px;
+    }
 }
 
 .sidebar-box-title {
