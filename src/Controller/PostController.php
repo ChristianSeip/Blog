@@ -30,7 +30,7 @@ class PostController extends AbstractController
     #[Route('/posts', name: 'app_posts')]
     public function list(EntityManagerInterface $entityManager,BBCodeParser $bbcodeParser): Response
     {
-        $posts = $entityManager->getRepository(Post::class)->findAll();
+        $posts = $entityManager->getRepository(Post::class)->findBy([], ['createdAt' => 'DESC']);
         foreach ($posts as $post) {
             $post->setContent($bbcodeParser->parse($post->getContent()));
         }
