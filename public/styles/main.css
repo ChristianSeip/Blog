@@ -51,6 +51,10 @@ body {
     }
 }
 
+.btn-sm {
+    padding: 5px 10px;
+}
+
 .btn-primary {
     background-color: var(--primary-color);
     &:hover {
@@ -351,7 +355,6 @@ form .form-group-checkbox label {
 .post-list {
     display: flex;
     flex-direction: column;
-    gap: 20px;
     li {
         padding: 16px;
         &:not(:last-child) {
@@ -366,8 +369,8 @@ form .form-group-checkbox label {
 .teaser {
     font-size: 16px;
     color: var(--text-color);
-    margin-top: 24px;
-    margin-bottom: 24px;
+    margin-top: 12px;
+    margin-bottom: 12px;
 }
 
 .meta {
@@ -390,8 +393,82 @@ form .form-group-checkbox label {
 
 .comment {
     margin-bottom: 20px;
+    .author {
+        font-size: 14px;
+    }
 }
 
-.comment .author {
-    font-size: 14px;
+.menu-link {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .page-header, .page-footer {
+        padding: 10px 20px;
+        align-items: center;
+        text-align: center;
+    }
+
+    .logo {
+        width: 120px;
+    }
+
+    .search-container {
+        margin: 20px 10px;
+        width: 60%;
+    }
+
+    .menu-link {
+        display: block;
+        cursor: pointer;
+        padding: 10px;
+        background-color: var(--accent-color);
+        color: white;
+        border-radius: 5px;
+        text-align: center;
+    }
+
+    .menu-dropdown {
+        display: none;
+        flex-direction: column;
+        gap: 10px;
+        position: absolute;
+        right: 0;
+        width: 100%;
+        height: 100vh;
+        background-color: white;
+        box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+        padding: 10px;
+        z-index: 1;
+        li {
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+        }
+    }
+
+    .menu-dropdown.show {
+        display: flex;
+    }
+
+    .content-wrapper {
+        display: flex;
+        flex-direction: column;
+        margin-left: 24px;
+        margin-right: 24px;
+    }
+
+    .main-content-wrapper {
+        width: 100%;
+    }
+
+    .sidebar {
+        width: 100%;
+        margin-top: 24px;
+    }
+}
+
+@media (max-width: 480px) {
+    .search-container {
+        display: none;
+    }
 }

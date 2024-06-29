@@ -13,22 +13,20 @@
 <body>
 <div class="page-outer-container">
   <header class="page-header">
-    <div>
-        <h1>
-            <a href="{{ path('app_index') }}">
-                <img class="logo" src="{{ asset('images/logo_small.png') }}" alt="Page Logo">
-            </a>
-        </h1>
-    </div>
+    <h1>
+        <a href="{{ path('app_index') }}">
+            <img class="logo" src="{{ asset('images/logo_small.png') }}" alt="Page Logo">
+        </a>
+    </h1>
     <div class="search-container">
       <form method="get" action="/posts/search">
         <input type="text" name="keyword" placeholder="Search..." value="{{ app.request.query.get('keyword') }}">
         <button type="submit" class="btn btn-primary">Search</button>
       </form>
     </div>
-    <div>
-        <nav>
-            <ul class="inline-list">
+    <nav>
+        <a href="javascript:void(0)" class="menu-link" onclick="switchMobileMenu()"><i class="fas fa-bars"></i></a>
+        <ul class="inline-list menu-dropdown">
             {% if get_user() is not null %}
                 <li><a href="{{ path('app_user_cp') }}">UCP</a></li>
                 <li><a href="{{ path('app_logout') }}">Logout</a></li>
@@ -36,9 +34,8 @@
                 <li><a href="{{ path('app_user_registration') }}">Register</a></li>
                 <li><a href="{{ path('app_login') }}">Login</a></li>
             {% endif %}
-            </ul>
-        </nav>
-    </div>
+        </ul>
+    </nav>
   </header>
   <div class="flash-messages">
       {% for label, messages in app.flashes %}
@@ -72,5 +69,12 @@
     </div>
   </footer>
 </div>
+<script>
+  function switchMobileMenu()
+  {
+    const menuDropdown = document.querySelector('.menu-dropdown');
+    menuDropdown.classList.toggle('show');
+  }
+</script>
 </body>
 </html>

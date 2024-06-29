@@ -21,7 +21,7 @@
                         <a href="{{ path('app_post_show', {'id': post.id}) }}">read more</a>
                     </div>
                     <footer class="meta">
-                        {{ post.author.name }} | {{ post.createdAt|date('d.m.Y H:i') }}
+                        {{ post.author.username }} | {{ post.createdAt|date('d.m.Y H:i') }}
                     </footer>
                 </li>
             {% else %}
