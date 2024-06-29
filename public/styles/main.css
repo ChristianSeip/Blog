@@ -90,7 +90,10 @@ a {
 }
 
 .page-outer-container {
+    display: flex;
+    flex-direction: column;
     width: 100%;
+    min-height: 100vh;
     color: var(--text-color);
 }
 
@@ -107,6 +110,7 @@ a {
 
 .content-boundary {
     display: flex;
+    flex-grow: 1;
     justify-content: center;
 }
 
